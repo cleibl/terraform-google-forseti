@@ -153,21 +153,6 @@ Remember to cleanup the service account used to install Forseti either manually,
 terraform destroy
 ```
 
-## Module Activity
-This module is a wrapper for the Forseti installation. The following steps are executed:
-
-1. Download Forseti repository
-
-    The Forseti repository is dowloaded at the root of the main.tf. If you prefer you can download the repository, modify the templates/files and skip this step.
-
-    **Set the variable `download_forseti = "false"` to skip this step.**
-
-    If you download the repository yourself, be sure to name the folder `forseti-security`.
-
-2. Execute the Forseti installation script
-
-    Terraform executes the Forseti installation script and then Forseti handles the rest of the setup using Deployment Manager templates.
-
 ## Autogeneration of documentation from .tf files
 Run
 ```
