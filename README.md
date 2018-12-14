@@ -11,12 +11,11 @@ A simple setup is provided in the examples folder; however, the usage of the mod
      *****************************************/
     module "forseti-install-simple" {
       source                       = "terraform-google-modules/forseti/google"
+      org_id                       = "395176825394"
       gsuite_admin_email           = "superadmin@yourdomain.com"
       project_id                   = "my-forseti-project"
-      download_forseti             = "true"
       sendgrid_api_key             = "345675432456743"
       notification_recipient_email = "admins@yourdomain.com"
-      credentials_file_path        = "/somewhere/credentials.json"
     }
 ```
 
@@ -36,20 +35,47 @@ Then perform the following commands on the config folder:
 |------|-------------|:----:|:-----:|:-----:|
 | cloud_sql_region | The Cloud SQL region | string | `us-central1` | no |
 | credentials_file_path | Path to service account json | string | - | yes |
-| download_forseti | Whether to download the forseti repo or not. If false, a Forseti repo must be in the root of main.tf file. (Default 'true') | string | `true` | no |
 | forseti_repo_branch | Forseti repository branch | string | `stable` | no |
 | forseti_repo_url | Foresti git repository URL | string | `https://github.com/GoogleCloudPlatform/forseti-security.git` | no |
-| gcs_location | The GCS bucket location | string | `us-central1` | no |
+| region | The location of resources | string | `us-east1` | no |
 | gsuite_admin_email | The email of a GSuite super admin, used for pulling user directory information. | string | - | yes |
 | notification_recipient_email | Notification recipient email | string | - | yes |
 | project_id | The ID of the project where Forseti will be installed | string | - | yes |
 | sendgrid_api_key | The Sendgrid api key for notifier | string | `` | no |
+| storage_class | The Storage Class for the Forseti Buckets | string | `regional` | no |
+| org_id | The ID of the Organization to provision resources | string | - | yes |
+| force_destroy | When deleting a bucket, this boolean option will delete all contained objects. If you try to delete a bucket that contains objects, Terraform will fail that run | boolean | true | no |
+| lifecycle_rules | The bucket's Lifecycle Rules configuration. Multiple blocks of this type are permitted. Structure is documented below. | list | [] | no |
+| versioning  | The bucket's Versioning configuration | string | `` | no |
+| routing_mode | Sets the network-wide routing mode for Cloud Routers to use. Accepted values are 'GLOBAL' or 'REGIONAL'. Defaults to 'REGIONAL'. | string | `regional` | no |
+| public_subnet_ip_cidr_range | The Public Subnet CIDR Range | string | `10.0.1.0/24` | no |
+| private_subnet_ip_cidr_range | The Private Subnet CIDR Range | string | `10.0.2.0/24` | no |
+| source_ssh_ranges            | The Source Ranges to Allow SSH Traffic to Forseti VM's | string | `0.0.0.0/0` | no |
+| sql_port | The Port to connect to the cloudsql instance on | string | `3306` | no |
+| machine_type | The Machine Type for the Forseti VM | string |  `n1-standard-n2` | no |
+| compute_image | The Compute Image to use for the Forseti VM.  Note only Ubuntu 18.04-LTS has been tested | string | `ubuntu-os-cloud/ubuntu-1804-lts` | no |
+| server_ip | Override the internal IP of the Forseti Server. If not provided, an internal IP will automatically be assigned. | string | `` | no |
+| client_ip | Override the internal IP of the Forseti Client. If not provided, an internal IP will automatically be assigned. | string | `` | no |
+| metadata | Metadata to be attached to the Forseti instance | map | { enable_oslogin = `TRUE`} | no |
+| forseti_server_service_account_org_iam_roles | The Roles to assign to the Forseti Server Service Account at the Organization Level.  Note these are already least privlidge | list | `see variables.tf` | no |
+| forseti_server_service_account_iam_roles | The Roles to assign to the Forseti Server Service Account at the Project Level | list | `see variables.tf` | no |
+| forseti_client_service_account_iam_roles | The Roles to assign to the Forseti Client Service Account at the Project Level | list | `see variables.tf` | no |
+| forseti-server-sa-scopes | The Service Account Scopes to Enable on the Forseti Server VM | list | `see variables.tf` | no |
+| forseti-client-sa-scopes | The Service Account Scopes to Enable on the Forseti Client VM | list | `see variables.tf` | no |
+| cron_schedule | The Cron Schedule Expression to tell forseti how often to run | string | `33 */2 * * *` | no
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| buckets_list | The buckets list within the created project |
+| forseti-server-bucket | The URL of the bucket for the forseti server |
+| forseti-client-bucket | The URL of the bucket for the forseti client |
+| forseti-server-external-ip | The External IP of the Forseti Server |
+| forseti-client-external-ip | The External IP of the Forseti Client |
+| forseti-mysql-instance-name | The Instance Name of the Forseti MySQL Server |
+| forseti-mysql-instance-address | The external address of the mysql instance |
+| forseti-mysql-database-name    | The Name of the Database used by Forseti   | 
+
 
 [^]: (autogen_docs_end)
 
@@ -123,10 +149,9 @@ More information about Domain Wide Delegation can be found [here](https://develo
 ### Cleanup
 Remember to cleanup the service account used to install Forseti either manually, or by running the command:
 
-`./scripts/cleanup.sh <project_id> <service_account_id>`
-
-
-This will deprovision and delete the service account, and then delete the credentials file.
+```bash
+terraform destroy
+```
 
 ## Module Activity
 This module is a wrapper for the Forseti installation. The following steps are executed:

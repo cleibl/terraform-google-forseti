@@ -14,7 +14,31 @@
  * limitations under the License.
  */
 
-output "buckets_list" {
-  value       = "${compact(split(" ", data.external.bucket_retrieval.result["buckets_list"]))}"
-  description = "The buckets list within the created project"
-}
+ output "forseti-server-bucket" {
+    value = "${module.server-storage-bucket.forseti_bucket_url}"
+ }
+
+  output "forseti-client-bucket" {
+    value = "${module.client-storage-bucket.forseti_bucket_url}"
+ }
+
+ output "forseti-server-external-ip" {
+    value = "${google_compute_address.forseti-server-ip.address}"
+ }
+
+ output "forseti-client-external-ip" {
+    value = "${google_compute_address.forseti-client-ip.address}"
+ }
+
+ output "forseti-mysql-instance-name" {
+    value = "${module.mysql-db.instance_name}"
+ }
+
+ output "forseti-mysql-instance-address" {
+    value = "${module.mysql-db.instance_address}"
+ }
+ output "forseti-mysql-database-name" {
+    value = "${module.mysql-db.database_name}"
+ }
+
+
