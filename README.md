@@ -33,8 +33,6 @@ Then perform the following commands on the config folder:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| cloud_sql_region | The Cloud SQL region | string | `us-central1` | no |
-| credentials_file_path | Path to service account json | string | - | yes |
 | forseti_repo_branch | Forseti repository branch | string | `stable` | no |
 | forseti_repo_url | Foresti git repository URL | string | `https://github.com/GoogleCloudPlatform/forseti-security.git` | no |
 | region | The location of resources | string | `us-east1` | no |
